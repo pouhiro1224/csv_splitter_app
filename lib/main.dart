@@ -115,9 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     inputLines = inputFile.openRead();
     await for (var line in inputLines.transform(Utf8Decoder()).transform(LineSplitter())) {
-      if(linesWritten == 0){
-        //最初、ヘッダ行を取っておく
+      if(headerRow == ""){
+        //最初、ヘッダ行を取っておいて、書き込んでおく
         headerRow = line;
+        outputSink.writeln(headerRow);
+        continue;
       }
       if (linesWritten != 0 && linesWritten % linesPerFile == 0) {
         if (outputSink != null) {
