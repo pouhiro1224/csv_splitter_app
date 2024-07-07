@@ -86,8 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
-    //lib以下にあるtanoya_product.csvを読み込む
-    //String inputFilePath = "/Users/takehiroshi/StudioProjects/hello_flutter_app/lib/tanoya_product.csv";
     int linesPerFile = rowsPerFile;
     final inputFile = file;
     if (!inputFile.existsSync()) {
@@ -138,7 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       outputSink.writeln(line);
       linesWritten++;
-      //print(linesWritten);
     }
 
     if (outputSink != null) {
@@ -150,64 +147,103 @@ class _MyHomePageState extends State<MyHomePage> {
       executing=false;
     });
     print('ファイルの分割が完了しました。');
-
-
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("使い方"),
-            Text("分割ファイル、分割後ファイルを出力するディレクトリ、分割する行数を入力したら、分割実行ボタンを押してください。"),
-            Text("出力されるファイルはoutput_{ファイル番号}.csv で出力されます。"),
-            ElevatedButton(onPressed: executing ? null : _pickFileIsSuccess, child: Text("分割ファイル選択")),
-            Text("分割するファイル：" + fileName),
-            ElevatedButton(onPressed: executing ? null : _selectFolder, child: Text("出力ディレクトリ選択")),
-            Text("出力するディレクトリ：" + _directoryPath!),
-            SizedBox( // <-- SEE HERE
-              width: 300,
-              child: TextField(
-                enabled: !executing,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  labelText: '分割する行数を入力してください',
-                  border: OutlineInputBorder(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Card(
+                elevation: 4.0,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "使い方",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text("分割ファイル、分割後ファイルを出力するディレクトリ、分割する行数を入力したら、分割実行ボタンを押してください。"),
+                      Text("出力されるファイルはoutput_{ファイル番号}.csv で出力されます。"),
+                    ],
+                  ),
                 ),
-                onChanged: (text) {
-                  setState(() {
-                    if(text == "" || text == null){
-                      rowsPerFile = 0;
-                      return;
-                    }
-                    rowsPerFile = int.parse(text);
-                  });
-                },
               ),
-            ),
-            LinearProgressIndicator(minHeight:20, value: _value.toDouble(),),
-            Text(_value == 1 ? "COMPLETE!!": ""),
-            ElevatedButton(onPressed: (executing || fileName == null || _directoryPath == null || rowsPerFile == 0) ? null : _splitFile, child: Text("分割実行")),
-          ],
+              Card(
+                elevation: 4.0,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      ElevatedButton(
+                        onPressed: executing ? null : _pickFileIsSuccess,
+                        child: Text("分割ファイル選択"),
+                      ),
+                      SizedBox(height: 8),
+                      Text("分割するファイル：$fileName"),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: executing ? null : _selectFolder,
+                        child: Text("出力ディレクトリ選択"),
+                      ),
+                      SizedBox(height: 8),
+                      Text("出力するディレクトリ：${_directoryPath ?? ""}"),
+                      SizedBox(height: 16),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          enabled: !executing,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          decoration: InputDecoration(
+                            labelText: '分割する行数を入力してください',
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (text) {
+                            setState(() {
+                              if (text.isEmpty) {
+                                rowsPerFile = 0;
+                                return;
+                              }
+                              rowsPerFile = int.parse(text);
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      LinearProgressIndicator(
+                        minHeight: 20,
+                        value: _value,
+                      ),
+                      SizedBox(height: 8),
+                      Text(_value == 1 ? "COMPLETE!!" : ""),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: (executing || fileName.isEmpty || _directoryPath == null || rowsPerFile == 0)
+                            ? null
+                            : _splitFile,
+                        child: Text("分割実行"),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-
       ),
     );
   }
