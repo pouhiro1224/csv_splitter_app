@@ -162,6 +162,9 @@ class _MyHomePageState extends State<MyHomePage> {
     String outputFilePath = '$_directoryPath/output_$fileCount.csv';
     File outputFile = File(outputFilePath);
     IOSink sink = outputFile.openWrite();
+    // UTF-8 BOM
+    sink.add([0xEF, 0xBB, 0xBF]);
+
     sink.writeln(headerRow);
     return sink;
   }
